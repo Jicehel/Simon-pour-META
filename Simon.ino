@@ -4,6 +4,7 @@
 
 #include <Gamebuino-Meta.h>
 #include <D:\Jean-Charles\META\Simon\Graphiques.h>  //import des graphiques
+#include <D:\Jean-Charles\META\Simon\sons.h>  //import des graphiques
 
 #define TOUCHE_BLEUE 1  // touche droite    
 #define TOUCHE_JAUNE 2  // touche bas     
@@ -98,7 +99,7 @@ void loop() {
 
     // Attente du délai de démarrage
     if (JeuCommence == false) {
-      if (JoueIntro == true) intro();
+      if (JoueIntro == true) { intro(); }
       Attente_TimerDebutJeu ++;
       if (Attente_TimerDebutJeu > timer_max * 1) {
          // NoteCourante = 0; //réinitialise la note courrante de la mélodie en début de jeu
@@ -166,33 +167,7 @@ void melodyPlaying() {
 }
 
 
-// Joue le son corespondant à la touche
-void JoueNote() {
-  switch (SonAJouer) {
-    case 1:
-      gb.sound.tone(1318,250);
-      AfficheBoutonBleu = true;
-      break;
-    case 2:
-      gb.sound.tone(1046,250);
-      AfficheBoutonJaune = true;
-      break;
-    case 3:
-      gb.sound.tone(1760,250);
-      AfficheBoutonVert = true;
-      break;
-    case 4:
-      gb.sound.tone(659,250);
-      AfficheBoutonRouge = true;
-      break;
-    case 5://=fail
-      gb.sound.playCancel();
-      break;
-  }
-}
-
-
-//Masque .
+//Masque le bouton
 void MasqueLeBouton() {
   switch (SonAJouer) {
     case 1:
@@ -227,8 +202,8 @@ void DessineBoutons() {
   }
  
   //Score actuel
-  gb.display.cursorX = 70;
-  gb.display.cursorY = 1;
+  gb.display.cursorX = 70;  gb.display.cursorY = 10;
+  gb.display.setColor(BLACK);
   gb.display.print(EtapeMelodieValidee - 1);
 }
 
@@ -313,19 +288,5 @@ void Erreur_Joueur() {
 }
 
 
-// introductions
-int intro() {
-    gb.gui.popup(NewGamePopup, 50);
-    SonAJouer = TOUCHE_ROUGE; JoueNote();MasqueLeBouton();
-    SonAJouer = TOUCHE_BLEUE; JoueNote();MasqueLeBouton();
-    SonAJouer = TOUCHE_VERTE; JoueNote();MasqueLeBouton();
-    SonAJouer = TOUCHE_JAUNE; JoueNote();MasqueLeBouton();
-    delay(1000);
-    SonAJouer = TOUCHE_JAUNE; JoueNote();MasqueLeBouton();
-    delay(250);
-    SonAJouer = TOUCHE_JAUNE; JoueNote();MasqueLeBouton();
-    delay(250);
-    SonAJouer = TOUCHE_ROUGE; JoueNote();MasqueLeBouton();
-    JoueIntro = false;
-}
+
 
