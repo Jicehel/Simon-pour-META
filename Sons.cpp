@@ -2,7 +2,7 @@
 
 // introductions
 int intro() {
-    gb.gui.popup(NewGamePopup, 50);
+    gb.gui.popup(NewGamePopup, 50,2);
     SonAJouer = TOUCHE_ROUGE; JoueNote();MasqueLeBouton();
     SonAJouer = TOUCHE_BLEUE; JoueNote();MasqueLeBouton();
     SonAJouer = TOUCHE_VERTE; JoueNote();MasqueLeBouton();

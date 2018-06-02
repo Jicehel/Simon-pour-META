@@ -1,10 +1,10 @@
-// Jeu du Simon sur la console fran�aise META
+// Jeu du Simon sur la console française META
 // site: www.gamebuino.com
-// Version 1.0
+// Version 1.1
 
 #include <Gamebuino-Meta.h>
 #include <D:\Jean-Charles\META\Simon\Graphiques.h>  //import des graphiques
-#include <D:\Jean-Charles\META\Simon\sons.h>  //import des graphiques
+#include <D:\Jean-Charles\META\Simon\Sons.h>  //import des graphiques
 
 #define TOUCHE_BLEUE 1  // touche droite    
 #define TOUCHE_JAUNE 2  // touche bas     
@@ -15,6 +15,10 @@
 #define timer_max 16 // Temps pour jouer une note
 #define NOTESMAX 42  // Nombre maximum de notes de la mélodie + 2 à ajouter au nombre désiré
 #define NBNOTES 4    // Nombre de notes possible (sur le Simon classique c'est 4 mais on pourrait faire des variantes)
+
+// Definition des valeurs pour le tour à jouer
+#define Joueur false
+#define Ordinateur true
 
 // Variables du jeu
 byte niveau        = 0; // nombre de notes à jouer 
@@ -36,7 +40,7 @@ bool AfficheBoutonVert;
 
 bool JeuCommence;     // Délai avant le début du jeu
 bool JoueIntro;       // On joue l'intro une fois
-bool Joue_Melodie;    // Actif quand l'ordi joue la mélodie
+bool AQuiDeJouer;    // Actif quand l'ordi joue la mélodie
 bool JoueMelodieComplete;      // Actif quand le joueur a joué toute la mélodie
 bool ErreurJoueur;    // Actif en cas d'erreur du joueur
 
@@ -44,11 +48,11 @@ byte Echec_timer;             // Temps écoulé
 byte Attente_TimerDebutJeu;
 byte Attente_TimerTour;
 byte SonAJouer;               // Mémorise le son à jouer et la touche à allumer puis à éteindre
-byte Melodie[NOTESMAX];        // Dimensionne le tableau contenant les notes à trouver
-byte NoteCourante;  //
+byte Melodie[NOTESMAX];       // Dimensionne le tableau contenant les notes à trouver
+byte NoteCourante;            // Indicateur de position dans la mélodie de la note à jouer 
 byte EtapeMelodieValidee;     // Augmente à chaque fois que le joueur trouve la bonne note
-byte Timer_Melodie;
-byte Timer_attente;
+byte AttenteProchaineNoteOrdinateur;
+byte AttenteNote;
 
 // Définition des textes des popups
 const MultiLang NewGamePopup[] = {
@@ -79,7 +83,7 @@ void initGame() {
   AfficheBoutonBleu = false;
   AfficheBoutonJaune = false;
   AfficheBoutonVert = false;
-  Joue_Melodie = true;            // L'ordinateur commence
+  AQuiDeJouer = Ordinateur;       // L'ordinateur commence
   JoueMelodieComplete = false;    // Jouer la mélodie complète
   ErreurJoueur = false;           // Réinitialise l'indicateur d'erreur
   Echec_timer = 0;                // Réinitalise de marqueur de dépassement de temps
@@ -88,8 +92,8 @@ void initGame() {
   SonAJouer = 0;                  // Aucun son à jouer
   NoteCourante = 0;//
   EtapeMelodieValidee = 1;        
-  Timer_Melodie = 0;
-  Timer_attente = 0;
+  AttenteProchaineNoteOrdinateur = 0;
+  AttenteNote = 0;
   JoueIntro = true;
 }
 
@@ -102,16 +106,16 @@ void loop() {
       if (JoueIntro == true) { intro(); }
       Attente_TimerDebutJeu ++;
       if (Attente_TimerDebutJeu > timer_max * 1) {
-         // NoteCourante = 0; //réinitialise la note courrante de la mélodie en début de jeu
+         // NoteCourante = 0; // Réinitialise la note courrante de la mélodie en début de jeu
         JeuCommence = true;
       }
     }
 
-    // Test si gagné (on a atteind le nombre de notes maximum)
+    // Test si le joueur a gagné (on a atteind le nombre de notes maximum)
     if ( EtapeMelodieValidee >= (NOTESMAX - 1) ) {
       //endRecord();
       gb.gui.popup(HighPopup, 50);
-      if (JoueMelodieComplete == false) JoueMelodieComplete == true; // Delande de joueur toute la mélodie
+      if (JoueMelodieComplete == false) JoueMelodieComplete == true; // Demande de jouer toute la mélodie
     }
     else
     {
@@ -120,50 +124,49 @@ void loop() {
       gb.display.drawImage(1, 0, Simon);
       
       // Gestion des tours
-      if ((Timer_attente == 0) && (JeuCommence == true)) {
-        if (Joue_Melodie == true) {
-          melodyPlaying();        // C'est l'ordinateur qui joue
-        } else playerPlaying();   // C'est u tour du joueur
+      if ((AttenteNote == 0) && (JeuCommence == true)) {
+        if (AQuiDeJouer == Ordinateur) {
+          TourOrdinateur();    // C'est l'ordinateur qui joue
+        } else TourJoueur();   // C'est au tour du joueur
       }
       
       // Attente après le tour du joueur
-      if (Timer_attente > 0) {
-        Timer_attente ++;
-        if (Timer_attente > timer_max >> 1) Timer_attente = 0;
+      if (AttenteNote > 0) {
+        AttenteNote ++;
+        if (AttenteNote > timer_max >> 1) AttenteNote = 0;
       }
-      
       // Dessine les buttons actifs
       DessineBoutons();
-    }//end record
-  }//end update.
-}//end loop.
+    } // Fin de la gestion des tours
+  }// Fin du test gb.update
+}// Fin de la boucle principale
 
-void melodyPlaying() {
-  //MELODY DELAY
-  if (Timer_Melodie == 0) {
-    SonAJouer = Melodie[NoteCourante];//update the value storing the value to play. //4;
-    JoueNote();//play the right sound.
+
+void TourOrdinateur() {
+  if (AttenteProchaineNoteOrdinateur == 0) { // Si le délai 
+    SonAJouer = Melodie[NoteCourante]; // Récupère la note suivante de la Mélodie à jouer
+    JoueNote(); // Joue le bon son
     DessineBoutons();
     delay(70);
-    MasqueLeBouton();//hide the right button
-    NoteCourante ++; //update for next playable note.
-    Timer_Melodie ++; //update delay
+    MasqueLeBouton(); // Cache le bouton allumé
+    NoteCourante ++;  // Passe à la note suivante
+    AttenteProchaineNoteOrdinateur ++; // Augmente le timer de 1
   }
 
-  if (Timer_Melodie > 0) { //start delay in-between notes
-    Timer_Melodie ++;
+  if (AttenteProchaineNoteOrdinateur > 0) { // Incrémente le timer entre les notes
+    AttenteProchaineNoteOrdinateur ++;
   }
-  if (Timer_Melodie > timer_max) { //end delay in-between notes = check if there are other notes to play...
+  if (AttenteProchaineNoteOrdinateur > timer_max) { // Fin du délai entre les notes, vérifie s'il rese des notes à jouer pour cette étape
 
-    if (NoteCourante >= EtapeMelodieValidee) {// = no more notes to play = player turn.
-      NoteCourante = 0; //reinitialize current playing note for the player.
-      Timer_Melodie = 0; // reinitialize the timer for the next time the CPU will play the extended melody.
-      Joue_Melodie = false; // = player turn
+    if (NoteCourante >= EtapeMelodieValidee) { // Si on a joué toutes les notes, passer au tour du joueur 
+      NoteCourante = 0;  // réinitialise le compteur de la note courante pour le tour du joueur
+      AttenteProchaineNoteOrdinateur = 0; // réinitialise le timer pour la mélodie pour le prochain tour de l'ordinateur
+      AQuiDeJouer = Joueur; // Passe au tour du joueur
     }
-    else {// = there are MORE notes to play until the currentnote hit the step limit.
-      Timer_Melodie = 0;// loop.
+    else {// Attente des notes restant à jouer
+      AttenteProchaineNoteOrdinateur = 0;
     }
-  } //delay after notes played by CPU.
+  } // Fin de la gestion de l'attente du délai après que l'ordinateur ait joué une note
 }
 
 
@@ -202,14 +205,14 @@ void DessineBoutons() {
   }
  
   //Score actuel
-  gb.display.cursorX = 70;  gb.display.cursorY = 10;
+  gb.display.cursorX = 68;  gb.display.cursorY = 9;
   gb.display.setColor(BLACK);
   gb.display.print(EtapeMelodieValidee - 1);
 }
 
 
 // Gestion du tour du joueur
-void playerPlaying() {
+void TourJoueur() {
   
   // Gestion des touches appuyées
   if (Attente_TimerTour == 0) {
@@ -252,14 +255,14 @@ void playerPlaying() {
       else  
       {
         NoteCourante ++;
-        Timer_Melodie = 1;
+        AttenteProchaineNoteOrdinateur = 1;
         Attente_TimerTour = 0;
         if (NoteCourante >= EtapeMelodieValidee) { // Si le joueur a joué toutes les notes jusqu'à la position actuelle, on continue
-          NoteCourante = 0;                        // Réinitialize la note à jouer par l'ordinateur au dbut de la mélodie.
-          Timer_Melodie = 0;                       // Rinitialize le timer de la mélodie.
-          Joue_Melodie = true;                     // Passe au tour de l'ordinateur
+          NoteCourante = 0;                        // Réinitialise la note à jouer par l'ordinateur au dbut de la mélodie.
+          AttenteProchaineNoteOrdinateur = 0;      // Réinitialise le timer de la mélodie.
+          AQuiDeJouer = Ordinateur;                // Passe au tour de l'ordinateur
           EtapeMelodieValidee ++;                  // Valide la note actuelle comme étape franchie
-          Timer_attente = 1;                         
+          AttenteNote = 1;                         
         }//fin du test de validation de la note
       }//fin du traitement du test d'ereur de la note jouée.
     }//Fin du traitement du test de dépassement du délai
@@ -279,10 +282,11 @@ void Appuie_bouton_Menu() {
 // Traitement d'une erreur du joueur
 void Erreur_Joueur() {
   Echec_timer ++;
-  SonAJouer = 5;//gb.sound.playCancel(); //sfx
-  if (Echec_timer <= 1) JoueNote(); //play sfx soundFail();
+  SonAJouer = 5;    // Joue son 'erreur'
+  if (Echec_timer <= 1) JoueNote(); 
+  delay(25);
   MasqueLeBouton();
-  if (Echec_timer > timer_max) { //delay ended...
+  if (Echec_timer > timer_max) { // Temps écoulé
     initGame();
   }
 }

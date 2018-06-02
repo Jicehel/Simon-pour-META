@@ -3,7 +3,7 @@
 
 #include <Gamebuino-Meta.h>
 
-extern Image Simon;  // Simmon électronique (fond
+extern Image Simon;  // Simmon électronique (fond)
 
 // images des boutons éteints
 extern Image rouge_eteint;
