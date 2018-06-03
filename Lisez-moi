@@ -1,0 +1,21 @@
+La META est une console française que tu peux programmer (https://gamebuino.com) pou faire tes propres jeux et les partager avec les autres.
+Si tu n'aimes pas programmer, je ne sais pas pourquoi tu lis ce fichier read me mais bon, tu peux aussi juste jouer avec les jeux faits par les autres ;)
+
+Simon pour META est un jeu basé sur le jeu électronique Simon https://fr.wikipedia.org/wiki/Simon_(jeu)
+
+Simon est un jeu de société électronique de mémoire inventé par Ralph H. Baer et Howard J. Morrison avec Lenny Cope qui s'est chargé de la programmation.
+De forme circulaire, le jeu Simon original comporte quatre grosses touches de couleurs différentes, rouge, vert, bleu et jaune.
+Le but du jeu est de retenir puis de reproduire une séquence musicale. 
+Chaque bouton (jaune, bleu, vert et rouge ) correspond à une note. À chaque tour le jeu ajoute une note supplémentaire. 
+Le joueur rejoue la séquence à chaque tour. Celle ci devenant de plus en plus longue à chaque tour.
+Si le joueur se trompe, il est éliminé.
+(Note dans le jeu original, on peut choisir la difficulté entre 8, 14, 20 ou 31 notes).
+Dans le mode multijoueurs, chaque joueur rajoute une note à la séquence. Le premier à se tromper est éliminé, le joueur restant est déclaré "grand vainqueur".
+
+J'avais commencé par reproduire l'interface originale du jeu de Simon (choix des modes, choix du nombre de joueurs par les touches, indication du tour du joeur par sa lumière qui s'allume) mais je me suis ravisé: Ils ont fait ce choix pour avoir une interface la plus conviviale possible avec leur matériel et honnêtement ils l'avaient très bien pensé mais maintenant ave un écran je trouve quand même plus clair d'utiliser un menu et des messages alors j'ai changé mon code pour remplacer cette interface.
+Actuellement les messages sont en anglais (of course...), en français, en allemand et en espagnol.
+Je ne sais pas combien de joueurs d'autres pays utiliseront ce jeu mais si vous parlez portuguais, italien, polonais,tunisien, marocain, algérien, arabe, japonnais, chinois, ... envoyez moi les traductions des messages (language.cpp) et je les ajouterais.
+
+Amusez vous bien  ;)
+
+Jicehel
