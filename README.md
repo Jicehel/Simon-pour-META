@@ -1,8 +1,4 @@
-Simon pour META
-
-==========================================
-English version (French vesion below)
-==========================================
+#Simon pour META
 
 The META is a french console that you can program (https://gamebuino.com) to make your own games and share with others. 
 (If you don't like program, i don't know why you ae reading this readme but you can only have fun with the games  ;) )
@@ -24,3 +20,5 @@ Note: To have text into english in the game, you have to set your console into e
       If i make errors when i have translated a message please send it to me.
       
 Have fun with this game
+
+Jicehel
