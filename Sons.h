@@ -2,7 +2,8 @@
 #define _SOUND_H_
 
 #include <Gamebuino-Meta.h>
-#include <D:\Jean-Charles\META\Simon\Simon.h>
+#include "Simon.h"
+#include "Language.h"
 
 extern byte SonAJouer;
 extern bool JoueIntro;
@@ -16,8 +17,9 @@ extern bool AfficheBoutonVert;
 #define TOUCHE_VERTE 3  // touche gauche           
 #define TOUCHE_ROUGE 4  // touche haut 
 
-void JoueNote();
-int intro();
+extern void JoueNote();
+extern int intro();
+extern int introMulti();
 
 #endif _SOUND_H_
 
