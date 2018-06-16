@@ -7,6 +7,7 @@
 #include "Sons.h"        // Gestion des sons
 #include "Language.h"    // Gestion des messages en Anglais et en français
 #include "Simon.h"
+#include "Highscore.h"
 
 // Variables du jeu
 byte niveau        = 0;        // Nombre de notes à jouer 
@@ -47,6 +48,7 @@ char ChaineJoueur[40];
 // Initialisation
 void setup() {
   gb.begin();
+  initHighscore();
   initGame();
 }
 
@@ -75,6 +77,7 @@ void initGame() {
   EtapeMelodieValidee = 1;   
   AttenteProchaineNote = 800;     
   AttenteNote = 0;
+  hiScore = highscore[0];
   JoueIntro = true;
 }
 
@@ -272,7 +275,7 @@ void Erreur_Joueur() {
     JoueursOK[(JoueurActif)] = 0;
     NbJoueurs--;
     if (NbJoueurs == 0) {
-        initGame();
+        saveHighscore(EtapeMelodieValidee-1);
     }
   }
 }
@@ -283,13 +286,15 @@ void EtatMenuInitial() {
     delay(200);
  
     // On peut appeler le menu
-    uint8_t entry = gb.gui.menu(title, entries, 4, LANGUAGE_DEFAULT_SIZE);
+    uint8_t entry = gb.gui.menu(title, entries, 5, LANGUAGE_DEFAULT_SIZE);
 
     // On fixe l'état selon le mode choisit
-    NbJoueurs = entry+ 1;
-    if (NbJoueurs == 1) JoueurActif = 1;
-   // Met à 1 le marqueur de joueur actif de 1 au nombre de joueurs sélectionnés
-   for(/*initialisation*/ int i=1; /*condition*/ i<=NbJoueurs; /*incrémentation*/ ++i){ JoueursOK[i]=1;   }   
+    if (entry < 4) { 
+      NbJoueurs = entry+ 1;
+      if (NbJoueurs == 1) JoueurActif = 1;
+      // Met à 1 le marqueur de joueur actif de 1 au nombre de joueurs sélectionnés
+      for(/*initialisation*/ int i=1; /*condition*/ i<=NbJoueurs; /*incrémentation*/ ++i){ JoueursOK[i]=1;   }   
+   } else { AQuiDeJouer = Joueur; drawHighScores(1); }
 }
 
 

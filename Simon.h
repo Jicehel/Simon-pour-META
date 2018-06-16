@@ -29,7 +29,7 @@ extern byte NoteCourante;
 extern byte EtapeMelodieValidee;
 extern bool AQuiDeJouer;
 extern int  JoueursOK[];
-extern char ChaineJoueur[];
+extern char ChaineJoueur[]; 
 
 #endif _SIMON_H_
 

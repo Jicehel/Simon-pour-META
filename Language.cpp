@@ -49,11 +49,17 @@ const MultiLang entry4players[] = {
     { LANG_DE, "4 Spieler" }, { LANG_ES, "4 jugadores" }, 
 };
 
+const MultiLang Highcores[] = {
+    { LANG_EN, "High scores" },  { LANG_FR, "Meilleurs scores" },
+    { LANG_DE, "Hohe Punktzahlen" }, { LANG_ES, "Puntuaciones altas" }, 
+};
+
 const MultiLang* entries[] = {
       entryOnePlayer,
       entry2players,
       entry3players,
       entry4players,
+      Highcores,
 };
 
 const MultiLang lang_joueur[] = {
